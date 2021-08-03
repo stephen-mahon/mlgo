@@ -3,13 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math/rand"
+	"image/color"
 	"os"
+	"strconv"
+	"strings"
 
 	"gonum.org/v1/gonum/mat"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
-	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
 )
 
@@ -30,7 +31,29 @@ func main() {
 
 	// Part 2: Plotting
 	fmt.Printf("Plotting Data ...\n")
-	graph()
+
+	file, err := os.Open("ex1data1.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	var X, y []float64
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		s := strings.Split(scanner.Text(), ",")
+		x_n, err := strconv.ParseFloat(s[0], 64)
+		if err != nil {
+			panic(err)
+		}
+		y_n, err := strconv.ParseFloat(s[1], 64)
+		if err != nil {
+			panic(err)
+		}
+		X = append(X, x_n)
+		y = append(y, y_n)
+	}
+	xy := xyPoints(X, y)
+	graph(xy)
 }
 
 func warmUpExercise() {
@@ -38,36 +61,31 @@ func warmUpExercise() {
 	fmt.Println(a)
 }
 
-func graph() {
-	rand.Seed(int64(0))
-
+func graph(xy plotter.XYs) {
 	p := plot.New()
 
-	p.Title.Text = "Plotutil example"
+	p.Title.Text = "Linear Regression"
 	p.X.Label.Text = "X"
-	p.Y.Label.Text = "Y"
+	p.Y.Label.Text = "y"
 
-	err := plotutil.AddLinePoints(p,
-		"First", randomPoints(15))
+	s, err := plotter.NewScatter(xy)
 	if err != nil {
 		panic(err)
 	}
+	s.GlyphStyle.Color = color.RGBA{R: 255, B: 128, A: 255}
 
+	p.Add(s)
 	// Save the plot to a PNG file.
-	if err := p.Save(4*vg.Inch, 4*vg.Inch, "points.png"); err != nil {
+	if err := p.Save(6*vg.Inch, 6*vg.Inch, "points.png"); err != nil {
 		panic(err)
 	}
 }
 
-func randomPoints(n int) plotter.XYs {
-	pts := make(plotter.XYs, n)
+func xyPoints(x, y []float64) plotter.XYs {
+	pts := make(plotter.XYs, len(x))
 	for i := range pts {
-		if i == 0 {
-			pts[i].X = rand.Float64()
-		} else {
-			pts[i].X = pts[i-1].X + rand.Float64()
-		}
-		pts[i].Y = pts[i].X + 10*rand.Float64()
+		pts[i].X = x[i]
+		pts[i].Y = y[i]
 	}
 	return pts
 }
