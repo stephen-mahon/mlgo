@@ -4,88 +4,86 @@ import (
 	"bufio"
 	"fmt"
 	"image/color"
+	"log"
 	"os"
-	"strconv"
-	"strings"
 
-	"gonum.org/v1/gonum/mat"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
-	"gonum.org/v1/plot/vg"
+	"gonum.org/v1/plot/vg/draw"
 )
 
 // Machine Learning Online Class - Exercise 1: Linear Regression
 
 // x refers to the population size in 10,000s
 // y refers to the profit in $10,000s
+var fileName = "ex1data1.txt"
 
 func main() {
-	// Part 1: Basic Function
-	fmt.Printf("Running warmUpExercise ... \n")
-	fmt.Printf("5x5 Identity Matrix: \n")
-	warmUpExercise()
-
-	fmt.Printf("Program paused. Press enter to continue.\n")
-	reader := bufio.NewReader(os.Stdin)
-	reader.ReadString('\n')
-
-	// Part 2: Plotting
-	fmt.Printf("Plotting Data ...\n")
-
-	file, err := os.Open("ex1data1.txt")
+	xys, err := readData(fileName)
 	if err != nil {
-		panic(err)
+		log.Fatalf("could not read %v: %v", fileName, err)
 	}
-	defer file.Close()
-	var X, y []float64
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		s := strings.Split(scanner.Text(), ",")
-		x_n, err := strconv.ParseFloat(s[0], 64)
-		if err != nil {
-			panic(err)
-		}
-		y_n, err := strconv.ParseFloat(s[1], 64)
-		if err != nil {
-			panic(err)
-		}
-		X = append(X, x_n)
-		y = append(y, y_n)
+	_ = xys
+
+	err = plotData("out.png", xys)
+	if err != nil {
+		log.Fatalf("could not plot data: %v", err)
 	}
-	xy := xyPoints(X, y)
-	graph(xy)
 }
 
-func warmUpExercise() {
-	a := mat.NewDiagDense(5, []float64{1, 1, 1, 1, 1})
-	fmt.Println(a)
+type xy struct{ x, y float64 }
+
+func readData(path string) ([]xy, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	var xys []xy
+	s := bufio.NewScanner(f)
+	for s.Scan() {
+		var x, y float64
+		_, err := fmt.Sscanf(s.Text(), "%f,%f", &x, &y)
+		if err != nil {
+			log.Printf("discarding bad data point %q: %v", s.Text(), err)
+		}
+		xys = append(xys, xy{x, y})
+	}
+	if err := s.Err(); err != nil {
+		return nil, fmt.Errorf("could not scan: %v", err)
+	}
+	return xys, nil
 }
 
-func graph(xy plotter.XYs) {
+func plotData(path string, xys []xy) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return fmt.Errorf("could not create %s: %v", path, err)
+	}
+
 	p := plot.New()
-
-	p.Title.Text = "Linear Regression"
-	p.X.Label.Text = "X"
-	p.Y.Label.Text = "y"
-
-	s, err := plotter.NewScatter(xy)
+	wt, err := p.WriterTo(512, 512, "png")
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("could not create writer: %v", err)
 	}
+
+	s, err := plotter.NewScatter(plotter.XYs{
+		{0, 0}, {0.5, 0.5}, {1, 1},
+	})
+	if err != nil {
+		return fmt.Errorf("could not create scatter : %v", err)
+	}
+	s.GlyphStyle.Shape = draw.CrossGlyph{}
 	s.GlyphStyle.Color = color.RGBA{R: 255, B: 128, A: 255}
-
 	p.Add(s)
-	// Save the plot to a PNG file.
-	if err := p.Save(6*vg.Inch, 6*vg.Inch, "points.png"); err != nil {
-		panic(err)
-	}
-}
 
-func xyPoints(x, y []float64) plotter.XYs {
-	pts := make(plotter.XYs, len(x))
-	for i := range pts {
-		pts[i].X = x[i]
-		pts[i].Y = y[i]
+	_, err = wt.WriteTo(f)
+	if err != nil {
+		return fmt.Errorf("could not write to %s: %v", path, err)
 	}
-	return pts
+	if err := f.Close(); err != nil {
+		return fmt.Errorf("could not close %s: %v", path, err)
+	}
+	return nil
 }
