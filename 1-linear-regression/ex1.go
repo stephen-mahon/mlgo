@@ -18,10 +18,14 @@ import (
 // y refers to the profit in $10,000s
 var fileName = "ex1data1.txt"
 var iterations int
+var alpha float64
 
 func main() {
-	flag.IntVar(&iterations, "n", 1000, "number of iterations for linear regression")
+	flag.IntVar(&iterations, "n", 1500, "number of iterations for linear regression")
+	flag.Float64Var(&alpha, "a", 0.01, "the learning rate for gradient descent")
 	flag.Parse()
+
+	fmt.Print("Plotting Data ...\n")
 	xys, err := readData(fileName)
 	if err != nil {
 		log.Fatalf("could not read %v: %v", fileName, err)
@@ -31,9 +35,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not plot data: %v", err)
 	}
+	fmt.Print("Program paused. Press enter to continue.")
+	bufio.NewReader(os.Stdin).ReadBytes('\n')
 }
-
-//type xy struct{ x, y float64 }
 
 func readData(path string) (plotter.XYs, error) {
 	f, err := os.Open(path)
@@ -75,9 +79,8 @@ func plotData(path string, xys plotter.XYs) error {
 	s.GlyphStyle.Shape = draw.CrossGlyph{}
 	p.Add(s)
 
-	x, c := linearRegression(xys, 0.01)
+	x, c := linearRegression(xys, alpha)
 
-	// create fake linear regression restult
 	l, err := plotter.NewLine(plotter.XYs{
 		{3, 3*x + c}, {20, 20*x + c},
 	})
