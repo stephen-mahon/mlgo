@@ -25,18 +25,26 @@ func main() {
 	flag.Float64Var(&alpha, "a", 0.01, "the learning rate for gradient descent")
 	flag.Parse()
 
+	// ## Part 1: Plotting
 	fmt.Print("Plotting Data ...\n")
 	xys, err := readData(fileName)
 	if err != nil {
 		log.Fatalf("could not read %v: %v", fileName, err)
 	}
 
-	err = plotData("out.png", xys)
+	err = plotData("plotData.png", xys)
 	if err != nil {
 		log.Fatalf("could not plot data: %v", err)
 	}
 	fmt.Print("Program paused. Press enter to continue.")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
+
+	// ## Part 2: Cost and Gradient descent
+	//theta := []int {0,0}
+	fmt.Print("\nTesting the cost function ...\n")
+	j := computeCost(xys, 0, 0)
+	fmt.Printf("With theta = [0 ; 0]\nCost computed = %.2f\n", j)
+	fmt.Printf("Expected cost value (approx) 32.07\n")
 }
 
 func readData(path string) (plotter.XYs, error) {
@@ -64,6 +72,37 @@ func readData(path string) (plotter.XYs, error) {
 }
 
 func plotData(path string, xys plotter.XYs) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return fmt.Errorf("could not create %s: %v", path, err)
+	}
+
+	p := plot.New()
+
+	// create scatter with all data points
+	s, err := plotter.NewScatter(xys)
+	if err != nil {
+		return fmt.Errorf("could not create scatter : %v", err)
+	}
+	s.GlyphStyle.Shape = draw.CrossGlyph{}
+	p.Add(s)
+
+	wt, err := p.WriterTo(512, 512, "png")
+	if err != nil {
+		return fmt.Errorf("could not create writer: %v", err)
+	}
+
+	_, err = wt.WriteTo(f)
+	if err != nil {
+		return fmt.Errorf("could not write to %s: %v", path, err)
+	}
+	if err := f.Close(); err != nil {
+		return fmt.Errorf("could not close %s: %v", path, err)
+	}
+	return nil
+}
+
+func plotem(path string, xys plotter.XYs) error {
 	f, err := os.Create(path)
 	if err != nil {
 		return fmt.Errorf("could not create %s: %v", path, err)
