@@ -17,7 +17,7 @@ Before starting on any task, it is often useful to understand the data by visual
 For this dataset, you can use a scatter plot to visualize the data, since it has only two properties to plot (profit and population).
 (Many other problems that you will encounter in real life are multi-dimensional and can't be plotted on a 2-d plot.)
 
-In ex1.m, the dataset is loaded from the data file into the variables `X` and `y`:
+In ex1.m, the dataset is loaded from the data file into the variable `xys`:
 
 ```
 xys, err := readData(fileName) // filename = "ex1data1.txt"
