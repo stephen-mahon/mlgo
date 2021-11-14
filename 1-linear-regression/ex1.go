@@ -27,7 +27,7 @@ func main() {
 
 	// ## Part 1: Plotting
 	fmt.Print("Plotting Data ...\n")
-	xys, err := readData(fileName)
+	xys, err := readData(fileName) // filename = "ex1data1.txt"
 	if err != nil {
 		log.Fatalf("could not read %v: %v", fileName, err)
 	}

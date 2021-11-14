@@ -12,3 +12,24 @@ The file `ex1data1.txt` contains the dataset for our linear regression problem. 
 
 The `ex1.go` script has already been set up to load this data for you.
 
+### 1.1 Plotting the Data
+Before starting on any task, it is often useful to understand the data by visualizing it.
+For this dataset, you can use a scatter plot to visualize the data, since it has only two properties to plot (profit and population).
+(Many other problems that you will encounter in real life are multi-dimensional and can't be plotted on a 2-d plot.)
+
+In ex1.m, the dataset is loaded from the data file into the variables `X` and `y`:
+
+```
+xys, err := readData(fileName) // filename = "ex1data1.txt"
+if err != nil {
+    log.Fatalf("could not read %v: %v", fileName, err)
+}
+```
+
+Next, the script calls the fuction plotData to create a scatter plot of the data.
+Your job is to complete function to draw the plot.
+```
+[ ] Plot the data
+[ ] Set the y-axis label to "Profit in $10,000s"
+[ ] Set the x-axis label to "Population of City in 10,000s"
+```
