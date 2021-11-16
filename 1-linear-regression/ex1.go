@@ -12,8 +12,6 @@ import (
 
 // Machine Learning Online Class - Exercise 1: Linear Regression
 
-// x refers to the population size in 10,000s
-// y refers to the profit in $10,000s
 var fileName = "ex1data1.txt"
 var iterations int
 var alpha float64
@@ -23,7 +21,7 @@ func main() {
 	flag.Float64Var(&alpha, "a", 0.01, "the learning rate for gradient descent")
 	flag.Parse()
 
-	// ## Part 1: Plotting
+	// ======================= Part 1: Plotting =======================
 	fmt.Print("Plotting Data ...\n")
 	xys, err := readData(fileName) // filename = "ex1data1.txt"
 	if err != nil {
@@ -37,11 +35,11 @@ func main() {
 	fmt.Print("Program paused. Press enter to continue.")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	// ## Part 2: Cost and Gradient descent
-	//theta := []int {0,0}
+	// =================== Part 2: Cost and Gradient descent ===================
+	theta := []float64{0.0, 0.0} // initialize fitting parameters
 	fmt.Print("\nTesting the cost function ...\n")
-	//j := computeCost(xys, 0, 0)
-	//fmt.Printf("With theta = [0 ; 0]\nCost computed = %.2f\n", j)
+	j := ComputeCost(xys, theta)
+	fmt.Printf("With theta = %v\nCost computed = %.2f\n", theta, j)
 	fmt.Printf("Expected cost value (approx) 32.07\n")
 }
 
@@ -122,18 +120,6 @@ func linearRegression(xys plotter.XYs, alpha float64) (m, c float64) {
 	}
 	fmt.Printf("cost(%.2f, %.2f) = %.2f\n", m, c, computeCost(xys, m, c))
 	return m, c
-}
-
-func computeCost(xys plotter.XYs, m, c float64) float64 {
-	// cost = 1/N * sum((y-(m*x+c)^2)
-	s := 0.0
-
-	for _, xy := range xys {
-		d := xy.Y - (xy.X*m + c)
-		s += d * d
-	}
-
-	return s / float64(len(xys))
 }
 
 func computeGradient(xys plotter.XYs, m, c float64) (dm, dc float64) {

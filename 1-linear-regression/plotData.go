@@ -31,8 +31,8 @@ func PlotData(path string, xys plotter.XYs) error {
 	if err != nil {
 		return fmt.Errorf("could not create scatter : %v", err)
 	}
-	s.GlyphStyle.Color = color.RGBA{R: 255, A: 255}
 	s.GlyphStyle.Shape = draw.CrossGlyph{}
+	s.Color = color.RGBA{R: 255, A: 255}
 	p.Add(s)
 
 	wt, err := p.WriterTo(512, 512, "png")
