@@ -55,3 +55,38 @@ In batch gradient descent, each iteration performs the update
 
 With each step of gradient descent, your parameters $$\theta_j$$ come closer to the
 optimal values that will achieve the lowest cost $$J(\theta)$$.
+
+#### 1.2.2 Implementation
+in `ex1.go`, we have already set up the data for linear regression
+In the following lines, we add another dimension to our data to accommodate the `\theta_0` intercept term.
+We also initialize the initial parameters to 0 and the learning rate alpha is set as default to 0.01.
+
+#### 1.2.3 Computing the Cost `J(theta)`
+As you perform gradient descent to learn minimize the cost function `J(theta)`, it is helpful to monitor the convergence by computing the cost.
+In this section, you will implement a function to calculate `J(theta)` so you can check the convergence of your gradient descent implementation.
+
+Your next task is to complete the code in the file `ComputeCost.go`, which is a function that computes `J(theta)`.
+
+Once you have completed the function, the next step in `ex1.go` will run `ComputeCost` once using `theta` initialized to zeros, and you will see the cost printed to the screen.
+You should expect to see a cost of 32.07.
+
+#### Gradient descent
+Next, you will implement gradient descent in the file `gradientDescent.go`.
+You need to supply the updates to `theta` within each iteration.
+
+As you program, make sure you understand what you are trying to opti-
+mize and what is being updated. Keep in mind that the cost `J(theta)` is parame-
+terized by the vector `theta`, not `xys`. That is, we minimize the value of `J(theta)`
+by changing the values of the vector `theta`, not by changing `xys`.
+
+A good way to verify that gradient descent is working correctly is to look
+at the value of `J(theta)` and check that it is decreasing with each step. The
+starter code for gradientDescent.m calls computeCost on every iteration
+and prints the cost. Assuming you have implemented gradient descent and
+computeCost correctly, your value of `J(theta)` should never increase, and should
+converge to a steady value by the end of the algorithm.
+
+After you are finished, ex1.m will use your final parameters to plot the linear fit.
+
+Your final values for `theta` will also be used to make predictions on profits in
+areas of 35,000 and 70,000 people.
