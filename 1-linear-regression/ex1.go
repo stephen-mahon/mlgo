@@ -32,15 +32,31 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not plot data: %v", err)
 	}
-	fmt.Print("Program paused. Press enter to continue.")
-	bufio.NewReader(os.Stdin).ReadBytes('\n')
+	pause()
 
 	// =================== Part 2: Cost and Gradient descent ===================
 	theta := []float64{0.0, 0.0} // initialize fitting parameters
 	fmt.Print("\nTesting the cost function ...\n")
-	j := ComputeCost(xys, theta)
+	j, _, _ := ComputeCost(xys, theta)
 	fmt.Printf("With theta = %v\nCost computed = %.2f\n", theta, j)
 	fmt.Printf("Expected cost value (approx) 32.07\n")
+
+	// further testing of cost function
+	theta = []float64{-1, 2}
+	j, _, _ = ComputeCost(xys, theta)
+	fmt.Printf("\nWith theta = %v\nCost computed = %.2f\n", theta, j)
+	fmt.Print("Expected cost value (approx) 54.24\n")
+	pause()
+
+	fmt.Print("\nRunning Gradient Descent ...\n")
+	// run gradient descent
+	fmt.Println(GradientDescent(xys, alpha))
+
+}
+
+func pause() {
+	fmt.Print("Program paused. Press enter to continue.")
+	bufio.NewReader(os.Stdin).ReadBytes('\n')
 }
 
 func readData(path string) (plotter.XYs, error) {
