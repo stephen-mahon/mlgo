@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-
-	"gonum.org/v1/plot/plotter"
 )
 
 // Machine Learning Online Class - Exercise 1: Linear Regression
@@ -22,35 +20,10 @@ func main() {
 	flag.Parse()
 
 	// ======================= Part 1: Plotting =======================
-	fmt.Print("Plotting Data ...\n")
-	xys, err := readData(fileName) // filename = "ex1data1.txt"
+	_, _, err := readData(fileName)
 	if err != nil {
-		log.Fatalf("could not read %v: %v", fileName, err)
+		log.Fatalf("could not read %s: %v", fileName, err)
 	}
-
-	err = PlotData("plotData.png", xys)
-	if err != nil {
-		log.Fatalf("could not plot data: %v", err)
-	}
-	pause()
-
-	// =================== Part 2: Cost and Gradient descent ===================
-	theta := []float64{0.0, 0.0} // initialize fitting parameters
-	fmt.Print("\nTesting the cost function ...\n")
-	j, _, _ := ComputeCost(xys, theta)
-	fmt.Printf("With theta = %v\nCost computed = %.2f\n", theta, j)
-	fmt.Printf("Expected cost value (approx) 32.07\n")
-
-	// further testing of cost function
-	theta = []float64{-1, 2}
-	j, _, _ = ComputeCost(xys, theta)
-	fmt.Printf("\nWith theta = %v\nCost computed = %.2f\n", theta, j)
-	fmt.Print("Expected cost value (approx) 54.24\n")
-	pause()
-
-	fmt.Print("\nRunning Gradient Descent ...\n")
-	// run gradient descent
-	fmt.Println(GradientDescent(xys, alpha))
 
 }
 
@@ -59,14 +32,13 @@ func pause() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 }
 
-func readData(path string) (plotter.XYs, error) {
+func readData(path string) (xs, ys []float64, err error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer f.Close()
 
-	var xys plotter.XYs
 	s := bufio.NewScanner(f)
 	for s.Scan() {
 		var x, y float64
@@ -75,12 +47,14 @@ func readData(path string) (plotter.XYs, error) {
 			log.Printf("discarding bad data point %q: %v", s.Text(), err)
 			continue
 		}
-		xys = append(xys, struct{ X, Y float64 }{x, y})
+		xs = append(xs, x)
+		ys = append(ys, y)
+
 	}
 	if err := s.Err(); err != nil {
-		return nil, fmt.Errorf("could not scan: %v", err)
+		return nil, nil, fmt.Errorf("could not scan: %v", err)
 	}
-	return xys, nil
+	return xs, ys, nil
 }
 
 /*
