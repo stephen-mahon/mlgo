@@ -10,26 +10,31 @@ import (
 	"gonum.org/v1/plot/vg/draw"
 )
 
-/*
-	[X] Plot the data
-	[X] Set the y-axis label to "Profit in $10,000s"
-	[X] Set the x-axis label to "Population of City in 10,000s"
-*/
+type xyer struct {
+	xs, ys []float64
+}
 
-func PlotData(path string, xys plotter.XYs) error {
+func (x xyer) Len() int {
+	return len(x.xs)
+}
+
+func (x xyer) XY(i int) (float64, float64) {
+	return x.xs[i], x.ys[i]
+}
+
+func PlotData(path string, xs, ys []float64) error {
+	p := plot.New()
+	p.Y.Label.Text = "Profit in $10,000s"
+	p.X.Label.Text = "Population of City in 10,000s"
+
 	f, err := os.Create(path)
 	if err != nil {
 		return fmt.Errorf("could not create %s: %v", path, err)
 	}
 
-	p := plot.New()
-	p.Y.Label.Text = "Profit in $10,000s"
-	p.X.Label.Text = "Population of City in 10,000s"
-
-	// create scatter with all data points
-	s, err := plotter.NewScatter(xys)
+	s, err := plotter.NewScatter(xyer{xs, ys})
 	if err != nil {
-		return fmt.Errorf("could not create scatter : %v", err)
+		return fmt.Errorf("could not create scatter: %v", err)
 	}
 	s.GlyphStyle.Shape = draw.CrossGlyph{}
 	s.Color = color.RGBA{R: 255, A: 255}

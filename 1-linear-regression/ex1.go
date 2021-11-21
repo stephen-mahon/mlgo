@@ -20,11 +20,23 @@ func main() {
 	flag.Parse()
 
 	// ======================= Part 1: Plotting =======================
-	_, _, err := readData(fileName)
+	fmt.Print("Plotting data...\n")
+	xs, ys, err := readData(fileName)
 	if err != nil {
 		log.Fatalf("could not read %s: %v", fileName, err)
 	}
+	err = PlotData(fileName, xs, ys)
+	if err != nil {
+		log.Fatalf("could not plot data: %v", err)
+	}
+	pause()
 
+	// =================== Part 2: Cost and Gradient descent ===================
+	fmt.Print("\nTesting the cost function ...\n")
+	j, _, _ := ComputeCost(xs, ys, []float64{0, 0})
+	fmt.Printf("\nWith theta = [-1 ; 2]\nCost computed = %f\n", j)
+	fmt.Printf("Expected cost value (approx) 54.24\n")
+	pause()
 }
 
 func pause() {
